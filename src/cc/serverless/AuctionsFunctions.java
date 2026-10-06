@@ -164,13 +164,14 @@ public class AuctionsFunctions {
     public HttpResponseMessage search(@HttpTrigger(name = "req",
                                               methods = { HttpMethod.GET },
                                               authLevel = AuthorizationLevel.ANONYMOUS,
-                                              route = "auction/search/{q}/{st=0}/{len=20}")
+                                              route = "auction/search/{q}")
                                       HttpRequestMessage<Optional<Auction>> request,
                                       @BindingName("q") String query,
-                                      @BindingName("st") int offset,
-                                      @BindingName("len") int length,
                                       final ExecutionContext context) {
         context.getLogger().info("GET auction/popular/{q}/{st}/{len} called");
+
+        int offset = Integer.parseInt(request.getQueryParameters().getOrDefault("st", "0"));
+        int length = Integer.parseInt(request.getQueryParameters().getOrDefault("len", "20"));
 
         Result<Auction[]> r = AuctionOps.getInstance().search(query, offset, length);
         return r.isOK()

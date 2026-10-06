@@ -89,14 +89,15 @@ public class UserFunctions {
     public HttpResponseMessage auctions(@HttpTrigger(name = "req",
                                                 methods = { HttpMethod.GET },
                                                 authLevel = AuthorizationLevel.ANONYMOUS,
-                                                route = "user/{id}/auctions/{status=\"\"}/{st=0}/{len=20}")
+                                                route = "user/{id}/auctions")
                                         HttpRequestMessage<Optional<User>> request,
                                         @BindingName("id") String id,
-                                        @BindingName("status") String status,
-                                        @BindingName("st") int offset,
-                                        @BindingName("len") int limit,
                                         final ExecutionContext context) {
-        context.getLogger().info("user/{id}/auctions/{status}/{st}/{len} called");
+        context.getLogger().info("user/{id}/auctions called");
+
+        String status = request.getQueryParameters().getOrDefault("status", "");
+        int offset = Integer.parseInt(request.getQueryParameters().getOrDefault("st", "0"));
+        int limit = Integer.parseInt(request.getQueryParameters().getOrDefault("len", "20"));
 
         Result<Auction[]> r = UserOps.getInstance().auctions(id, status, offset, limit);
         return r.isOK()
