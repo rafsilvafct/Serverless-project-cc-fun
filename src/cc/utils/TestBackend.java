@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 
 /**
  * Calls every endpoint of a running server and prints what fails. Only needs the base URL.
@@ -73,7 +74,7 @@ public class TestBackend {
 		byte[] img = new byte[64 * 1024];
 		new java.util.Random(42).nextBytes(img);
 
-		HttpResponse<String> up = postBytes("/media", "image/png", img);
+		HttpResponse<String> up = postBytes("/media", "application/octet-stream", img);
 		boolean uploaded = check("POST /media returns 200", up.statusCode() == 200);
 
 		if (!uploaded) {
@@ -201,12 +202,12 @@ public class TestBackend {
 		check("GET /auction/any/popular returns a list",
 				get("/auction/any/popular?st=0&len=20").body().startsWith("["));
 
-		HttpResponse<String> hit = get("/auction/search?q=comfortable&st=0&len=20");
+		HttpResponse<String> hit = get("/auction/any/search?q=comfortable&st=0&len=20");
 		check("search returns 200", hit.statusCode() == 200);
 		check("search finds the auction by description word",
 				auctionId != null && hit.body().contains(auctionId));
 
-		HttpResponse<String> miss = get("/auction/search?q=zzzznomatch&st=0&len=20");
+		HttpResponse<String> miss = get("/auction/any/search?q=zzzznomatch&st=0&len=20");
 		check("search returns an empty list for no match", miss.body().trim().equals("[]"));
 	}
 
